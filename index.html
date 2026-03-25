@@ -1,171 +1,215 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random 0/1</title>
-    <style>
-        /* ============================================================
-           CHỈNH KÍCH THƯỚC Ô KẾT QUẢ TẠI ĐÂY
-           ============================================================ */
-        :root {
-            --box-size: 35px;       /* Chiều rộng và chiều cao của ô */
-            --box-gap: 5px;        /* Khoảng cách giữa các ô */
-            --box-font-size: 1.3rem;  /* Kích thước chữ số bên trong */
-            --box-radius: 12px;     /* Độ bo góc của ô */
-            
-            /* Màu sắc giao diện */
-            --bg-color: #0f172a;
-            --container-bg: #1e293b;
-            --primary-color: #22d3ee;
-            --accent-color: #334155;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random 0/1</title>
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-color);
-            margin: 30px auto;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+<style>
+:root {
+    --box-size: 35px;
+    --box-gap: 8px;
+    --box-radius: 14px;
 
-        .container {
-            background-color: var(--container-bg);
-            padding: 20px;
-            border-radius: 25px;
-            /* Container tự động nở theo kích thước ô bạn chỉnh */
-            width: fit-content; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+    --bg: linear-gradient(135deg, #0f172a, #020617);
+    --glass: rgba(255,255,255,0.05);
+    --primary: #22d3ee;
+    --blue: #3b82f6;
+    --pink: #ec4899;
+}
 
-        h2 { color: var(--primary-color); margin-bottom: 25px; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-        .ratio-section { width: 100%; margin-bottom: 25px; }
-        
-        .slider {
-            -webkit-appearance: none;
-            width: 100%; height: 8px; border-radius: 10px;
-            background: var(--accent-color); outline: none;
-        }
+/* Container glass */
+.container {
+    backdrop-filter: blur(15px);
+    background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: fadeIn 0.6s ease;
+}
 
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px; height: 24px; border-radius: 50%;
-            background: var(--primary-color); cursor: pointer; border: 3px solid #fff;
-        }
+@keyframes fadeIn {
+    from {opacity:0; transform: translateY(20px);}
+    to {opacity:1; transform: translateY(0);}
+}
 
-        .ratio-display { 
-            display: flex; justify-content: space-between; 
-            margin-top: 15px; font-weight: bold; color: #94a3b8; 
-        }
+h2 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
 
-        .ratio-display b { color: var(--primary-color); }
+/* Slider */
+.slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+}
 
-        .btn-random {
-            background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
-            color: #0f172a; border: none; padding: 16px;
-            font-size: 1rem; font-weight: 800; border-radius: 12px;
-            cursor: pointer; width: 100%; margin-bottom: 30px;
-            transition: 0.2s;
-        }
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--blue));
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary);
+}
 
-        .btn-random:active { transform: scale(0.96); }
+.ratio-display {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    color: #cbd5f5;
+}
 
-        /* --- CẤU HÌNH Ô KẾT QUẢ SỬ DỤNG BIẾN TRÊN ĐẦU --- */
-        .result-container {
-            display: grid;
-            grid-template-columns: repeat(6, auto); /* Tự động theo kích thước ô */
-            gap: var(--box-gap);
-            justify-content: center;
-        }
+/* Button */
+.btn-random {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    background: linear-gradient(135deg, var(--primary), var(--blue));
+    color: #020617;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 10px 25px rgba(34,211,238,0.3);
+}
 
-        .result-box {
-            background-color: rgba(15, 23, 42, 0.6);
-            border: 2px solid var(--accent-color);
-            color: var(--primary-color);
-            
-            /* Kích thước lấy từ :root */
-            width: var(--box-size);
-            height: var(--box-size);
-            font-size: var(--box-font-size);
-            border-radius: var(--box-radius);
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Consolas', monospace;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
+.btn-random:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(34,211,238,0.5);
+}
 
-        .pop { animation: pulse 0.3s ease-out; border-color: var(--primary-color); }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-    </style>
+.btn-random:active {
+    transform: scale(0.96);
+}
+
+/* Result grid */
+.result-container {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    gap: var(--box-gap);
+    justify-content: center;
+}
+
+/* Box */
+.result-box {
+    width: var(--box-size);
+    height: var(--box-size);
+    border-radius: var(--box-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: white;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.3s;
+}
+
+/* Hiệu ứng theo số */
+.result-box.zero {
+    color: #60a5fa;
+    box-shadow: 0 0 10px rgba(96,165,250,0.6);
+}
+
+.result-box.one {
+    color: yellow;
+    box-shadow: 0 0 10px rgba(244,114,182,0.6);
+}
+
+/* Animation */
+.pop {
+    animation: pop 0.25s ease;
+}
+@keyframes pop {
+    0% { transform: scale(0.8); }
+    100% { transform: scale(1); }
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <h2>Tỷ lệ ngẫu nhiên 0 / 1</h2>
-    
-    <div class="ratio-section">
-        <input type="range" min="0" max="6" value="3" class="slider" id="ratioSlider">
-        <div class="ratio-display">
-            <span>Số 0: <b id="val0">3</b></span>
-            <span>Số 1: <b id="val1">3</b></span>
-        </div>
+    <h2>✨ Random 0 / 1</h2>
+
+    <input type="range" min="0" max="6" value="3" class="slider" id="ratioSlider">
+
+    <div class="ratio-display">
+        <span> <b id="val0">3</b>  số 0</span>
+        <span> <b id="val1">3</b>  số 1</span>
     </div>
 
-    <button class="btn-random" onclick="generateRandom()">NGẪU NHIÊN</button>
+    <button class="btn-random" onclick="generateRandom()">TẠO NGẪU NHIÊN</button>
 
     <div class="result-container">
-        <div class="result-box" id="box0"></div>
-        <div class="result-box" id="box1"></div>
-        <div class="result-box" id="box2"></div>
-        <div class="result-box" id="box3"></div>
-        <div class="result-box" id="box4"></div>
-        <div class="result-box" id="box5"></div>
+        <div class="result-box"></div>
+        <div class="result-box"></div>
+        <div class="result-box"></div>
+        <div class="result-box"></div>
+        <div class="result-box"></div>
+        <div class="result-box"></div>
     </div>
 </div>
 
 <script>
-    const slider = document.getElementById("ratioSlider");
-    const val0 = document.getElementById("val0");
-    const val1 = document.getElementById("val1");
-    const boxes = document.querySelectorAll(".result-box");
+const slider = document.getElementById("ratioSlider");
+const val0 = document.getElementById("val0");
+const val1 = document.getElementById("val1");
+const boxes = document.querySelectorAll(".result-box");
 
-    slider.oninput = function() {
-        val0.innerText = 6 - this.value;
-        val1.innerText = this.value;
+slider.oninput = function() {
+    val0.innerText = 6 - this.value;
+    val1.innerText = this.value;
+}
+
+function generateRandom() {
+    const num1 = parseInt(slider.value);
+    const num0 = 6 - num1;
+
+    let pool = [];
+    for (let i = 0; i < num0; i++) pool.push(0);
+    for (let i = 0; i < num1; i++) pool.push(1);
+
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    function generateRandom() {
-        const num1 = parseInt(slider.value);
-        const num0 = 6 - num1;
-        let pool = [];
-        for (let i = 0; i < num0; i++) pool.push(0);
-        for (let i = 0; i < num1; i++) pool.push(1);
-        for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
-        }
-        boxes.forEach((box, i) => {
-            box.innerText = pool[i];
-            box.classList.remove('pop');
-            void box.offsetWidth; 
-            box.classList.add('pop');
-        });
-    }
-    window.onload = generateRandom;
+    boxes.forEach((box, i) => {
+        box.innerText = pool[i];
+
+        box.classList.remove("zero","one","pop");
+        void box.offsetWidth;
+
+        if(pool[i] === 0) box.classList.add("zero");
+        else box.classList.add("one");
+
+        box.classList.add("pop");
+    });
+}
+
+window.onload = generateRandom;
 </script>
 
 </body>
